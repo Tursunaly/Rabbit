@@ -1,27 +1,30 @@
 Проект producer и consumer. Состоит из двух сервисов, которые взаимодействуют между собой через брокера сообщений RabbitMq.
 Swagger UI доступен по адресу, для ручной отправки сообщения:
+
 http://localhost:5036/swagger/index.html
+
 используется для тестирования и просмотра API
 
-Роут producer api 
-/api/rabbit
-/api/rabbit/send
+Роут producer api: 
+1. /api/rabbit
+2. /api/rabbit/send
 роут /api/rabbit/send отправляет сообщение в очередь RabbitMq
 тело(json) 
 "текcтовое сообщение"
 поведение, принимает строковое сообщение из тела запроса
 публикует сообщение рэббит 
 ошибки подключения приводят к http 500
-ответ 
+ответ:
+ 
 {
   "status": "Сообщение отправлено",
   "message": "текстовое сообщение"
 }
 
-Роут consumer api 
-/api/consumer
-/api/consumer/status
-/api/consumer/health
+Роут consumer api: 
+1. /api/consumer
+2. /api/consumer/status
+3. /api/consumer/health
 consumer запускается как backgroundservice в фоновом режиме
 /api/consumer/status возвращает текущее состояние статуса о полученного сообщения
 /api/consumer/health эндпоит для мониторинга сервиса
