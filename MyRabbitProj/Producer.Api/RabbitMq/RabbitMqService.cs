@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace RabbitMqProducer.RabbitMq
 {
-  public class RabbitMqService : IRabbitMqService
+    public class RabbitMqService : IRabbitMqService
     {
         private const string QueueName = "queue-test";
 
@@ -23,10 +23,9 @@ namespace RabbitMqProducer.RabbitMq
 
             _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
             _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
-
             _channel.QueueDeclareAsync(
                 queue: QueueName,
-                durable: false,
+                durable: true,
                 exclusive: false,
                 autoDelete: false
             ).GetAwaiter().GetResult();
@@ -35,14 +34,16 @@ namespace RabbitMqProducer.RabbitMq
         public async Task SendMessageAsync(string message)
         {
             var body = Encoding.UTF8.GetBytes(message);
+            var properties = _channel.CreateBasicProperties();
+            properties.Persistent = true;
 
             await _channel.BasicPublishAsync(
                 exchange: "",
                 routingKey: QueueName,
+                basicProperties: properties,
                 body: body
             );
         }
-
         public async Task SendMessageAsync<T>(T message)
         {
             var json = JsonSerializer.Serialize(message);
@@ -50,6 +51,7 @@ namespace RabbitMqProducer.RabbitMq
         }
     }
 }
+
 
 
 
