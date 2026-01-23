@@ -1,10 +1,11 @@
-using Consumer.Api.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
+using Consumer.Api.RabbitMq;
+
 
 namespace Consumer.Api.Controllers;
 
 [ApiController]
-[Route("api/consumer")]
+[Route("[controller]")]
 public class ConsumerController : ControllerBase
 {
     private readonly RabbitMqConsumerService _service;
@@ -19,9 +20,8 @@ public class ConsumerController : ControllerBase
     {
         return Ok(new
         {
-            state = _service.State.ToString(),
-            isRunning = _service.State == ConsumerState.Running,
-            error = _service.LastError,
+            service = "RabbitMQ Consumer",
+            running = true,
             timestamp = DateTime.UtcNow
         });
     }
@@ -31,9 +31,8 @@ public class ConsumerController : ControllerBase
     {
         return Ok(new
         {
-            status = _service.State == ConsumerState.Running ? "OK" : "ERROR",
-            service = "RabbitMQ Consumer",
-            state = _service.State.ToString()
+            status = "OK",
+            service = "RabbitMQ Consumer"
         });
     }
 }

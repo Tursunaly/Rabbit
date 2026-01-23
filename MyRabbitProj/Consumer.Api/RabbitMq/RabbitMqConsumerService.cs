@@ -11,10 +11,8 @@ public class RabbitMqConsumerService : BackgroundService
     private readonly ILogger<RabbitMqConsumerService> _logger;
     private IConnection? _connection;
     private IChannel? _channel;
-    private readonly string _queueName = "queue-test";
-    
-    public ConsumerState State { get; private set; } = ConsumerState.Stopped;
-    public string? LastError { get; private set; }
+
+    private const string QueueName = "queue-test";
 
     public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger)
     {
@@ -23,9 +21,6 @@ public class RabbitMqConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Start consumer");
-        State = ConsumerState.Starting;
-
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -35,19 +30,15 @@ public class RabbitMqConsumerService : BackgroundService
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("Consumer остановлен");
                 break;
             }
             catch (Exception ex)
             {
-                LastError = ex.Message;
-                _logger.LogError(ex, "Ошибка подключения переподключение, через 10 секунд ");
-                State = ConsumerState.Faulted;
-                
-                await Task.Delay(10000, stoppingToken);
+                _logger.LogError(ex, "Ошибка работы RabbitMQ consumer");
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }
-        
+
         await StopConsumerAsync();
     }
 
@@ -61,82 +52,64 @@ public class RabbitMqConsumerService : BackgroundService
             Password = "guest"
         };
 
-        _logger.LogInformation("Коннект {Host}:{Port}...", 
-            factory.HostName, factory.Port);
-
         _connection = await factory.CreateConnectionAsync(stoppingToken);
         _channel = await _connection.CreateChannelAsync();
+
         await _channel.QueueDeclareAsync(
-            queue: _queueName,
+            QueueName,
             durable: false,
             exclusive: false,
             autoDelete: false,
             cancellationToken: stoppingToken
         );
 
-        _logger.LogInformation("Поключение к RabbitMq: Queue: {Queue}", _queueName);
         var consumer = new AsyncEventingBasicConsumer(_channel);
-        
-        consumer.ReceivedAsync += async (sender, ea) =>
+        consumer.ReceivedAsync += async (_, ea) =>
         {
             try
             {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                _logger.LogInformation("Отправленно: {Message}", message);
-                
-                await ProcessMessageAsync(message, stoppingToken);
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                _logger.LogInformation("Сообщение: {Message}", message);
+                await ProcessMessageAsync(message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошбика обработки сообщения");
+                _logger.LogError(ex, "Ошибка обработки сообщения");
             }
         };
+
         await _channel.BasicConsumeAsync(
-            queue: _queueName,
+            QueueName,
             autoAck: true,
             consumer: consumer,
             cancellationToken: stoppingToken
         );
-
-        State = ConsumerState.Running;
-        _logger.LogInformation("Consumer запущен устпешно");
     }
 
-    private async Task ProcessMessageAsync(string message, CancellationToken cancellationToken)
+    private Task ProcessMessageAsync(string message)
     {
-        _logger.LogDebug("Обработка сообщения: {Message}", message);
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private async Task StopConsumerAsync()
     {
-        _logger.LogInformation("Остановки сервиса RabbitMq");
-        State = ConsumerState.Stopped;
-
         try
         {
-            if (_channel?.IsClosed == false)
-            {
+            if (_channel != null)
                 await _channel.CloseAsync();
-                _logger.LogInformation("Канал приостановлен");
-            }
 
-            if (_connection?.IsOpen == true)
-            {
+            if (_connection != null)
                 await _connection.CloseAsync();
-                _logger.LogInformation("Подключение остановлена");
-            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка остановка RabbitMq");
+            _logger.LogError(ex, "Ошибка при остановке RabbitMQ");
         }
-        
-        _channel?.Dispose();
-        _connection?.Dispose();
-        
-        _logger.LogInformation("RabbitMq остановлен");
+        finally
+        {
+            _channel?.Dispose();
+            _connection?.Dispose();
+        }
     }
 
     public override void Dispose()
@@ -144,12 +117,4 @@ public class RabbitMqConsumerService : BackgroundService
         StopConsumerAsync().GetAwaiter().GetResult();
         base.Dispose();
     }
-}
-
-public enum ConsumerState
-{
-    Stopped,
-    Starting,
-    Running,
-    Faulted
 }
