@@ -6,8 +6,7 @@ http://localhost:5036/swagger/index.html
 используется для тестирования и просмотра API
 
 Роут producer api: 
-1. /api/rabbit
-2. /api/rabbit/send
+1. POST /api/rabbit/send
 роут /api/rabbit/send отправляет сообщение в очередь RabbitMq
 тело(json) 
 "текcтовое сообщение"
@@ -22,9 +21,9 @@ http://localhost:5036/swagger/index.html
 }
 
 Роут consumer api: 
-1. /api/consumer
-2. /api/consumer/status
-3. /api/consumer/health
+1. GET  /api/consumer/status
+2. GET  /api/consumer/health
+
 consumer запускается как backgroundservice в фоновом режиме
 /api/consumer/status возвращает текущее состояние статуса о полученного сообщения
 /api/consumer/health эндпоит для мониторинга сервиса
