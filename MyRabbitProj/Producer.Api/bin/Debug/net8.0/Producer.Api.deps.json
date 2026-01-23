@@ -9,7 +9,7 @@
       "Producer.Api/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": "8.0.6",
-          "RabbitMQ.Client": "7.0.0",
+          "RabbitMQ.Client": "7.2.0",
           "Swashbuckle.AspNetCore": "6.7.0"
         },
         "runtime": {
@@ -36,7 +36,7 @@
           }
         }
       },
-      "RabbitMQ.Client/7.0.0": {
+      "RabbitMQ.Client/7.2.0": {
         "dependencies": {
           "System.IO.Pipelines": "8.0.0",
           "System.Threading.RateLimiting": "8.0.0"
@@ -44,7 +44,7 @@
         "runtime": {
           "lib/net8.0/RabbitMQ.Client.dll": {
             "assemblyVersion": "7.0.0.0",
-            "fileVersion": "7.0.0.0"
+            "fileVersion": "7.2.0.0"
           }
         }
       },
@@ -117,12 +117,12 @@
       "path": "microsoft.openapi/1.6.14",
       "hashPath": "microsoft.openapi.1.6.14.nupkg.sha512"
     },
-    "RabbitMQ.Client/7.0.0": {
+    "RabbitMQ.Client/7.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8YJz22mOSMtkbIVuVSz2HbJwbpKwRoXQ1uqbczDUt1w1Ds8dxFs6dkV/oZ8AlTmkErZjtQelHv+oBu52ud00WA==",
-      "path": "rabbitmq.client/7.0.0",
-      "hashPath": "rabbitmq.client.7.0.0.nupkg.sha512"
+      "sha512": "sha512-PPQ7cF7lwbhqC4up6en1bTUZlz06YqQwJecOJzsguTtyhNA7oL5uNDZIx/h6ZfcyPZV4V3DYKSCxfm4RUFLcbA==",
+      "path": "rabbitmq.client/7.2.0",
+      "hashPath": "rabbitmq.client.7.2.0.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/6.7.0": {
       "type": "package",
