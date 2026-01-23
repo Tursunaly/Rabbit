@@ -7,6 +7,7 @@ http://localhost:5036/swagger/index.html
 
 Роут producer api: 
 1. POST /api/rabbit/send
+
 роут /api/rabbit/send отправляет сообщение в очередь RabbitMq
 тело(json) 
 "текcтовое сообщение"
@@ -21,7 +22,9 @@ http://localhost:5036/swagger/index.html
 }
 
 Роут consumer api: 
+
 1. GET  /api/consumer/status
+
 2. GET  /api/consumer/health
 
 consumer запускается как backgroundservice в фоновом режиме
